@@ -1,0 +1,66 @@
+
+<form class="col-3"  id="myForm" onsubmit="SubForm()">
+  <div class="form-group">
+    <label for="title">Object Name</label>
+    <input type="text" class="form-control" name="title" id="title" placeholder="Enter object title" required>
+  </div>
+  <div class="form-group">
+    <label for="description">Object Description</label>
+    <input type="text" class="form-control" name="description" id="description" placeholder="Enter object description" required>
+  </div>
+  <div class="form-group">
+    <label for="dateacquired">Date acquired</label>
+    <input type="month" class="form-control" name="dateAcquired" id="dateacquired">
+  </div>
+    <!-- <select class="form-control" id="dateAcquired">
+      <option>Feb</option>
+      <option>2</option>
+      <option>3</option>
+      <option>4</option>
+      <option>5</option>
+    </select> -->
+  <!-- </div> -->
+  <!-- <div class="col-6">
+    <label for="name">Other Date</label>
+    <input type="month" class="form-control" id="dateAcquired">
+  </div> -->
+  <button type="submit" class="btn btn-outline-success">Submit</button>
+</form>
+
+<div class="col-9">
+  <div class="custom-control custom-switch">
+  <input type="checkbox" class="custom-control-input" id="customSwitch1">
+  <label class="custom-control-label" for="customSwitch1">Upload photo</label>
+  </div>
+</div>
+
+<script>
+function SubForm (){
+    $.ajax({
+        url:'/submit',
+        type:'post',
+        data:$('#myForm').serialize(),
+        success:function(){
+            console.log("Form Submited");
+        }
+    });
+}
+</script>
+<!-- <script>
+
+const request = require('request')
+
+request.post('/add', {
+  json: {
+    todo: 'Buy the milk'
+  }
+}, (error, res, body) => {
+  if (error) {
+    console.error(error)
+    return
+  }
+  console.log(`statusCode: ${res.statusCode}`)
+  console.log(body)
+})
+
+</script> -->

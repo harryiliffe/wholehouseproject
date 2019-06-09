@@ -1,0 +1,19 @@
+{
+  "name": "WholeHouseProject",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "main": "index.js",
+  "scripts": {
+    "test": "",
+    "start": "node app.js"
+  },
+  "author": "Harry Iliffe <iliffe.harry@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "bootstrap": "^4.3.1",
+    "express": "^4.7.2",
+    "lowdb": "^1.0.0",
+    "underscore-db": "^0.12.2"
+  }
+}
