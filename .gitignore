@@ -60,4 +60,8 @@ typings/
 # next.js build output
 .next
 
+#ignore Data base stuffs
 .DS_Store
+db
+tmp_uploads/
+uploads/

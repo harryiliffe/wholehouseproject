@@ -1,33 +1,41 @@
 
-<form class="col-3"  id="myForm" onsubmit="SubForm()">
+<form class="col-4"  id="myForm"  enctype="multipart/form-data">
+
   <div class="form-group">
     <label for="title">Object Name</label>
     <input type="text" class="form-control" name="title" id="title" placeholder="Enter object title" required>
   </div>
+
   <div class="form-group">
     <label for="description">Object Description</label>
     <input type="text" class="form-control" name="description" id="description" placeholder="Enter object description" required>
   </div>
+
   <div class="form-group">
     <label for="dateacquired">Date acquired</label>
     <input type="month" class="form-control" name="dateAcquired" id="dateacquired">
   </div>
-    <!-- <select class="form-control" id="dateAcquired">
-      <option>Feb</option>
-      <option>2</option>
-      <option>3</option>
-      <option>4</option>
-      <option>5</option>
-    </select> -->
-  <!-- </div> -->
-  <!-- <div class="col-6">
-    <label for="name">Other Date</label>
-    <input type="month" class="form-control" id="dateAcquired">
-  </div> -->
-  <button type="submit" class="btn btn-outline-success">Submit</button>
+
+  <div class="form-group">
+    <label for="quantity">Date acquired</label>
+    <input type="number" class="form-control" name="quantity" id="quantity" value="1">
+  </div>
+
+  <div class="form-group">
+    <label>Add Files</label><br/>
+      <label>
+          <span class="btn btn-outline-primary" >Browse&hellip;
+            <input type="file" name="photos" style="display: none;" multiple>
+          </span>
+      </label>
+      <div class="file-names small"></div>
+  </div>
+
+  <button type="button" onclick="SubForm(true)" class="btn btn-outline-secondary">Submit and Enter New</button>
+  <button type="button" onclick="SubForm(false)" class="btn btn-outline-success">Submit</button>
 </form>
 
-<div class="col-9">
+<div class="">
   <div class="custom-control custom-switch">
   <input type="checkbox" class="custom-control-input" id="customSwitch1">
   <label class="custom-control-label" for="customSwitch1">Upload photo</label>
@@ -35,32 +43,49 @@
 </div>
 
 <script>
-function SubForm (){
+function SubForm (formReset){
+    var form = document.getElementById('myForm');
+    var formData = new FormData(form);
+
     $.ajax({
-        url:'/submit',
-        type:'post',
-        data:$('#myForm').serialize(),
-        success:function(){
+        url: '/submit',
+        type: 'POST',
+        data: formData,
+        enctype: 'multipart/form-data',
+        success: function (itemID) {
             console.log("Form Submited");
-        }
+            console.log(itemID);
+            if(formReset){
+              form.reset();
+            } else {
+              window.location.href = "/view?itemID="+itemID;
+            }
+        },
+        cache: false,
+        contentType: false,
+        processData: false
     });
 }
+
+$(document).on('change', ':file', function() {
+    var input = $(this),
+        numFiles = input.get(0).files ? input.get(0).files.length : 1,
+        label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+    input.trigger('fileselect', [numFiles, label]);
+});
+
+$(document).ready( function() {
+    $(':file').on('fileselect', function(event, numFiles, label) {
+        console.log(numFiles);
+        console.log(label);
+        var input = $(this).parents('.form-group').find('.file-names'),
+              log = numFiles > 1 ? numFiles + ' files selected' : label;
+
+          if( input.length ) {
+              input.html(log);
+          } else {
+              if( log ) alert(log);
+          }
+    });
+});
 </script>
-<!-- <script>
-
-const request = require('request')
-
-request.post('/add', {
-  json: {
-    todo: 'Buy the milk'
-  }
-}, (error, res, body) => {
-  if (error) {
-    console.error(error)
-    return
-  }
-  console.log(`statusCode: ${res.statusCode}`)
-  console.log(body)
-})
-
-</script> -->
