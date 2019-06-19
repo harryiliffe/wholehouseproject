@@ -18,28 +18,19 @@ db._.mixin({
   }
 });
 
-db.defaults({ items: [], tags:[], user: {}, count: 0 })
-  .write()
+//=========Routes=========//
 
-db.set('user.name', 'harry')
-    .write()
-
-
-
-//ROUTE THINGS
-router.get('/', function (req, res) {
-    var items = db.get('items').value(); // Find all items in the collection
-    var user = db.get('user').value()
-    res.render('home', {
-      title: "Whole House Project",
-      user: user,
-      items: items
-
-    });
+router.get("/object", function(req, res) {
+  item = db.get('items')
+           .getById(req.query.itemID)
+           .value();
+  console.log("Serving "+item.id+ " to be veiwed.")
+  res.render('view', {
+    title: "Whole House Project",
+    name: "Harry",
+    item: item
+  });
 });
 
-router.use("/view", require("./view"));
-
-router.use("/add", require("./add"));
 
 module.exports = router;

@@ -50,7 +50,7 @@ function SubForm (formReset){
     var formData = new FormData(form);
 
     $.ajax({
-        url: '/submit',
+        url: '/add',
         type: 'POST',
         data: formData,
         enctype: 'multipart/form-data',
@@ -69,7 +69,7 @@ function SubForm (formReset){
               }, 2000);
 
             } else {
-              window.location.href = "/view?itemID="+res.id;
+              window.location.href = "/view/object?itemID="+res.id;
             }
         },
         cache: false,
