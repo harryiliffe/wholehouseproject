@@ -1,5 +1,4 @@
-
-<form class="col-4"  id="myForm"  enctype="multipart/form-data">
+<form class="col-12"  id="myForm"  enctype="multipart/form-data">
 
   <div class="form-group">
     <label for="title">Object Name</label>
@@ -8,12 +7,17 @@
 
   <div class="form-group">
     <label for="description">Object Description</label>
-    <input type="text" class="form-control" name="description" id="description" placeholder="Enter object description" required>
+    <textarea type="text" rows="3" class="form-control" name="description" id="description" placeholder="Enter object description" required style="resize:none;"></textarea>
   </div>
 
   <div class="form-group">
     <label for="dateacquired">Date acquired</label>
     <input type="month" class="form-control" name="dateAcquired" id="dateacquired">
+  </div>
+
+  <div class="form-group">
+    <label>Object Tags</label>
+    <input class="tagsinput" type="text" name="tags" value="" data-role="tagsinput"/>
   </div>
 
   <div class="form-group">
@@ -23,24 +27,22 @@
 
   <div class="form-group">
     <label>Add Files</label><br/>
-      <label>
-          <span class="btn btn-outline-primary" >Browse&hellip;
-            <input type="file" name="photos" style="display: none;" multiple>
-          </span>
-      </label>
-      <div class="file-names small"></div>
+    <button type="button" onclick="$('#imgupload').trigger('click');" class="btn btn-outline-primary">Browse&hellip;</button>
+    <div class="file-names small"></div>
+
+    <input type="file" name="photos" id="imgupload" style="display: none;" multiple>
   </div>
 
-  <button type="button" onclick="SubForm(true)" class="btn btn-outline-secondary">Submit and Enter New</button>
-  <button type="button" onclick="SubForm(false)" class="btn btn-outline-success">Submit</button>
+  <div class="form-group">
+    <button type="button" onclick="SubForm(true)" class="btn btn-outline-secondary">Submit and Enter New</button>
+    <button type="button" onclick="SubForm(false)" class="btn btn-outline-success">Submit</button>
+  </div>
+
+  <div class="alert alert-success" role="alert" id="successAlert" style="display: None; opacity:0;">
+    Object added to database successfully
+  </div>
+
 </form>
-
-<div class="">
-  <div class="custom-control custom-switch">
-  <input type="checkbox" class="custom-control-input" id="customSwitch1">
-  <label class="custom-control-label" for="customSwitch1">Upload photo</label>
-  </div>
-</div>
 
 <script>
 function SubForm (formReset){
@@ -52,13 +54,22 @@ function SubForm (formReset){
         type: 'POST',
         data: formData,
         enctype: 'multipart/form-data',
-        success: function (itemID) {
+        success: function (res) {
             console.log("Form Submited");
-            console.log(itemID);
             if(formReset){
+              tags.add(res.tags)
               form.reset();
+              $('.tagsinput').tagsinput('removeAll');
+
+              $("#successAlert").show().fadeTo(200,1);
+              window.setTimeout(function() {
+                  $("#successAlert").fadeTo(200, 0, function(){
+                      $(this).hide();
+                  });
+              }, 2000);
+
             } else {
-              window.location.href = "/view?itemID="+itemID;
+              window.location.href = "/view?itemID="+res.id;
             }
         },
         cache: false,
@@ -88,4 +99,19 @@ $(document).ready( function() {
           }
     });
 });
+
+var tags = new Bloodhound({
+  local: {{{tags}}},
+  datumTokenizer: Bloodhound.tokenizers.whitespace,
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+});
+
+$('.tagsinput').tagsinput({
+  typeaheadjs: {
+    name: "Tags",
+    source: tags.ttAdapter()
+  }
+});
+
+// $('#OpenImgUpload').click(function(){ $('#imgupload').trigger('click'); });
 </script>

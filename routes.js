@@ -18,7 +18,7 @@ db._.mixin({
   }
 });
 
-db.defaults({ items: [], user: {}, count: 0 })
+db.defaults({ items: [], tags:[], user: {}, count: 0 })
   .write()
 
 db.set('user.name', 'harry')
@@ -39,9 +39,11 @@ router.get('/', function (req, res) {
 });
 
 router.get('/add', function (req, res) {
+  tags = JSON.stringify(db.get('tags'));
     res.render('add', {
       title: "Whole House Project",
-      name: "Harry"
+      name: "Harry",
+      tags: tags
     });
 });
 
@@ -49,7 +51,6 @@ router.get("/view", function(req, res) {
   item = db.get('items')
            .getById(req.query.itemID)
            .value();
-  console.log(item);
 
   res.render('view', {
     title: "Whole House Project",
@@ -63,44 +64,49 @@ router.post('/submit', function (req, res) {
 
   const data = req.fields
 
+  //process tags
+  //parse tagString
+  tagArray = data.tags.split(",");
+  data.tags = tagArray;
+
+  dbTags = db.get("tags");
+  db.set("tags", dbTags.union(tagArray).value()).write();
+
+
   //add data to db
-  itemID = db.get('items')
+  item = db.get('items')
     .insert(data)
-    .write().id
+    .write()
+
 
   //proccess files
-  const filename = db.get('items')
-                     .getById(itemID)
-                     .value().title
-
-  const files = req.files.photos
-
+  const photos = req.files.photos
   //make directory
-  folder = path.join( 'public/images/' +itemID)
+  folder = path.join( 'public/images/' +item.id)
   if(!fs.existsSync(folder)){
     fs.mkdir(folder);
   }
 
-
   //move files
-  if(Array.isArray(files) && files.length>0){
+  if(Array.isArray(photos)){
     console.log("Multiple files detected")
-  } else {
+  } else if (photos.type != "application/octet-stream"){
     n = "";
-    while(fs.existsSync(path.join(folder, filename + n+".jpg"))){
+    while(fs.existsSync(path.join(folder, item.title + n+".jpg"))){
       n => n + 1;
     }
-    fs.rename(files.path, path.join(folder, filename + n+".jpg"));
+    fs.rename(photos.path, path.join(folder, item.title + n+".jpg"));
 
-    db.get('items')
-      .getById(itemID)
+    db.get("items")
+      .getById(item.id)
       .assign({imagePath:[]})
       .get("imagePath")
-      .push(path.join('images/',itemID, filename + n+".jpg"))
-      .write()
+      .push(path.join('images/',item.id, item.title + n+".jpg"))
+      .write();
   }
-  console.log("Data Received. Added Item: " + itemID);
-  res.send(itemID)
+
+  console.log("Data Received. Added Item: " + item.id);
+  res.send({"id":item.id,"tags":dbTags.value()});
 
 });
 
