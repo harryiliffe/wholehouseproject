@@ -8,10 +8,20 @@ const formidableMiddleware = require('express-formidable');
 
 
 
-
 //SETUP EXPRESS + HANDLEBARS
 
-app.engine('.hbs', exphbs({extname: '.hbs'}));
+app.engine('.hbs', exphbs({
+  extname: '.hbs',
+  helpers: {
+    default: function (value, safeValue) {
+        var out = value || safeValue;
+        return out;
+    }
+  },
+  helpers:require('handlebars-helpers')()
+
+}));
+
 app.set('view engine', '.hbs');
 
 app.use(formidableMiddleware({
