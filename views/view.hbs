@@ -1,13 +1,17 @@
 
-<div class="col-3">
+<div class="col-4">
   <h2>{{item.title}}</h2>
   <p>{{item.description}}</p>
   <p><strong>Date acquired: </strong>{{item.dateAcquired}}</p>
 
-
-  <button type="button" class="btn btn-outline-secondary">Update</button>
+  <div class="mb-3">
+    {{#each item.tags}}
+      <span class="badge badge-secondary">{{capitalize this}}</span>
+    {{/each}}
+  </div>
+  <a class="btn btn-outline-secondary" href="/add?itemID={{item.id}}" role="button">Update</a>
 </div>
 
-<div class="col-9">
-  <img src="{{item.imagePath}}" class="img-fluid" alt="Photo">
+<div class="col">
+  <img src="{{item.imagePath}}" class="img-fluid w-50" alt="Photo" >
 </div>

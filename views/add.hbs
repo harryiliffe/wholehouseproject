@@ -1,18 +1,22 @@
-<form class="col-12"  id="myForm"  enctype="multipart/form-data">
+<form class="col-12"  id="form"  enctype="multipart/form-data">
+
+  <div class="alert alert-danger" role="alert" id="warningAlert" style="display: None; opacity:0;">
+    {{invalidID}}
+  </div>
 
   <div class="form-group">
     <label for="title">Object Name</label>
-    <input type="text" class="form-control" name="title" id="title" placeholder="Enter object title" required>
+    <input type="text" class="form-control" name="title" id="title" placeholder="Enter object title" value="{{item.title}}" required>
   </div>
 
   <div class="form-group">
     <label for="description">Object Description</label>
-    <textarea type="text" rows="3" class="form-control" name="description" id="description" placeholder="Enter object description" required style="resize:none;"></textarea>
+    <textarea type="text" rows="3" class="form-control" name="description" id="description" placeholder="Enter object description" required style="resize:none;">{{item.description}}</textarea>
   </div>
 
   <div class="form-group">
     <label for="dateacquired">Date acquired</label>
-    <input type="month" class="form-control" name="dateAcquired" id="dateacquired">
+    <input type="month" class="form-control" name="dateAcquired" value="{{item.dateAcquired}}" id="dateacquired">
   </div>
 
   <div class="form-group">
@@ -21,8 +25,8 @@
   </div>
 
   <div class="form-group">
-    <label for="quantity">Date acquired</label>
-    <input type="number" class="form-control" name="quantity" id="quantity" value="1">
+    <label for="quantity">Quanitity</label>
+    <input type="number" class="form-control" name="quantity" value="{{item.quantity}}" id="quantity">
   </div>
 
   <div class="form-group">
@@ -39,16 +43,33 @@
   </div>
 
   <div class="alert alert-success" role="alert" id="successAlert" style="display: None; opacity:0;">
-    Object added to database successfully
+    {{submitAlert}}
   </div>
+
 
 </form>
 
 <script>
-function SubForm (formReset){
-    var form = document.getElementById('myForm');
-    var formData = new FormData(form);
 
+$(document).ready( function() {
+  if("{{invalidID}}" != ""){
+    window.history.replaceState(null,null,"/add");
+    $("#warningAlert").show().fadeTo(200,1);
+    window.setTimeout(function() {
+        $("#warningAlert").fadeTo(200, 0, function(){
+            $(this).hide();
+        });
+    }, 4000);
+  }
+});
+
+
+
+function SubForm (formReset){
+    var itemID = new URLSearchParams(window.location.search).get('itemID');
+    var form = document.getElementById('form');
+    var formData = new FormData(form);
+    if(itemID){formData.append("itemID", itemID);}
     $.ajax({
         url: '/add',
         type: 'POST',
@@ -57,8 +78,13 @@ function SubForm (formReset){
         success: function (res) {
             console.log("Form Submited");
             if(formReset){
-              tags.add(res.tags)
-              form.reset();
+              tagList.add(res.tagList);
+
+              window.history.replaceState(null,null,"/add?itemID="+res.item.id);
+              window.history.pushState(null,null,"/add");
+
+              //clears form
+              $("input,textarea").each(function(){this.value=""});
               $('.tagsinput').tagsinput('removeAll');
 
               $("#successAlert").show().fadeTo(200,1);
@@ -69,7 +95,7 @@ function SubForm (formReset){
               }, 2000);
 
             } else {
-              window.location.href = "/view/object?itemID="+res.id;
+              window.location.href = "/view/object?itemID="+res.item.id;
             }
         },
         cache: false,
@@ -100,8 +126,8 @@ $(document).ready( function() {
     });
 });
 
-var tags = new Bloodhound({
-  local: {{{tags}}},
+var tagList = new Bloodhound({
+  local: {{{default tagList []}}},
   datumTokenizer: Bloodhound.tokenizers.whitespace,
   queryTokenizer: Bloodhound.tokenizers.whitespace,
 });
@@ -109,9 +135,13 @@ var tags = new Bloodhound({
 $('.tagsinput').tagsinput({
   typeaheadjs: {
     name: "Tags",
-    source: tags.ttAdapter()
+    source: tagList.ttAdapter()
   }
 });
 
+var existingTags = {{{stringify (default item.tags "")}}}
+for(var i=0;i<existingTags.length;i++){
+  $('.tagsinput').tagsinput("add",existingTags[i]);
+}
 // $('#OpenImgUpload').click(function(){ $('#imgupload').trigger('click'); });
 </script>

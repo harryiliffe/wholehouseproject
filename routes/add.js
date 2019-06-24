@@ -5,28 +5,33 @@ const express = require('express');
 const router = express.Router();
 
 //DATABASE STUFF
-const low = require('lowdb');
-const FileSync = require('lowdb/adapters/FileSync');
-const adapter = new FileSync('db/db.json');
-const shortid = require('shortid');
-const db = low(adapter);
+const db = require('../db');
 
-db._.mixin(require('lodash-id'));
-db._.mixin({
-  createId: function(collectionName, doc) {
-    return shortid.generate();
-  }
-});
+dbTags = db.get("tags");
+
+function isEmpty(obj) {
+    for(var key in obj) {
+        if(obj.hasOwnProperty(key))
+            return false;
+    }
+    return true;
+}
 
 //=========Routes=========//
 
 router.get('/', function (req, res) {
-  tags = JSON.stringify(db.get('tags'));
-    res.render('add', {
-      title: "Whole House Project",
-      name: "Harry",
-      tags: tags
-    });
+  var item;
+  if(req.query.itemID){
+    item = db.get('items')
+             .getById(req.query.itemID)
+             .value();
+  }
+  res.render('add', {
+    item: item,
+    tagList: JSON.stringify(db.get("tags")),
+    submitAlert: item ?  "Object Successfully Updated" : "New Object Successfully Submitted",
+    invalidID: req.query.itemID && !item ? "Invalid itemID" : ""
+  });
 });
 
 router.post('/', function (req, res) {
@@ -37,15 +42,20 @@ router.post('/', function (req, res) {
   tagArray = data.tags.split(",");
   data.tags = tagArray;
 
-  dbTags = db.get("tags");
   db.set("tags", dbTags.union(tagArray).value()).write();
 
 
   //add data to db
-  item = db.get('items')
-    .insert(data)
-    .write()
-
+  if(data.itemID){
+    item = db.get("items")
+             .getById(data.itemID)
+             .assign(data)
+             .write();
+  } else {
+    item = db.get('items')
+             .insert(data)
+             .write();
+  }
 
   //proccess files
   const photos = req.files.photos
@@ -74,7 +84,7 @@ router.post('/', function (req, res) {
   }
 
   console.log("Data Received. Added Item: " + item.id);
-  res.send({"id":item.id,"tags":dbTags.value()});
+  res.send({"item":item,"tags":dbTags.value()});
 
 });
 
