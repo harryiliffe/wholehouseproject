@@ -7,7 +7,6 @@ const router = express.Router();
 //DATABASE STUFF
 const db = require('../db');
 
-dbTags = db.get("tags");
 
 function isEmpty(obj) {
     for(var key in obj) {
@@ -29,6 +28,7 @@ router.get('/', function (req, res) {
   res.render('add', {
     item: item,
     tagList: JSON.stringify(db.get("tags")),
+    collectionList: JSON.stringify(db.get("collections")),
     submitAlert: item ?  "Object Successfully Updated" : "New Object Successfully Submitted",
     invalidID: req.query.itemID && !item ? "Invalid itemID" : ""
   });
@@ -42,8 +42,8 @@ router.post('/', function (req, res) {
   tagArray = data.tags.split(",");
   data.tags = tagArray;
 
-  db.set("tags", dbTags.union(tagArray).value()).write();
-
+  db.set("tags", db.get("tags").union(tagArray).value()).write();
+  db.set("collections", db.get("collections").union([data.collection]).value()).write();
 
   //add data to db
   if(data.itemID){
@@ -84,7 +84,7 @@ router.post('/', function (req, res) {
   }
 
   console.log("Data Received. Added Item: " + item.id);
-  res.send({"item":item,"tags":dbTags.value()});
+  res.send({"item":item,"tags":db.get("tags").value()});
 
 });
 

@@ -6,7 +6,14 @@
 
   <div class="form-group">
     <label for="title">Object Name</label>
-    <input type="text" class="form-control" name="title" id="title" placeholder="Enter object title" value="{{item.title}}" required>
+    <input type="text" class="typeahead form-control" name="title" id="title" placeholder="Enter object title" value="{{item.title}}" required>
+  </div>
+
+  <div class="form-group">
+    <label for="collection">Object Collection</label>
+    <div class="form-control">
+      <input type="text" name="collection" id="collection" placeholder="Enter object collection" value="{{item.collection}}"></input>
+    </div>
   </div>
 
   <div class="form-group">
@@ -21,7 +28,7 @@
 
   <div class="form-group">
     <label>Object Tags</label>
-    <input class="tagsinput" type="text" name="tags" value="" data-role="tagsinput"/>
+    <input class="tagsinput" type="text" name="tags" id="tags" value="" data-role="tagsinput"/>
   </div>
 
   <div class="form-group">
@@ -79,7 +86,8 @@ function SubForm (formReset){
             console.log("Form Submited");
             if(formReset){
               tagList.add(res.tagList);
-
+              collectionList.add(res.collectionList);
+              
               window.history.replaceState(null,null,"/add?itemID="+res.item.id);
               window.history.pushState(null,null,"/add");
 
@@ -125,14 +133,27 @@ $(document).ready( function() {
           }
     });
 });
+//=======COLLECTION========
+var collectionList = new Bloodhound({
+  local: {{{default collectionList "[]"}}},
+  datumTokenizer: Bloodhound.tokenizers.whitespace,
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+});
 
+$('#collection').typeahead({},
+{
+  name: "collectionList",
+  source: collectionList
+});
+
+//=======TAGS========
 var tagList = new Bloodhound({
   local: {{{default tagList []}}},
   datumTokenizer: Bloodhound.tokenizers.whitespace,
   queryTokenizer: Bloodhound.tokenizers.whitespace,
 });
 
-$('.tagsinput').tagsinput({
+$('#tags').tagsinput({
   typeaheadjs: {
     name: "Tags",
     source: tagList.ttAdapter()

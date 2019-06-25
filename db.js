@@ -18,10 +18,10 @@ db._.mixin({
   }
 });
 
-db.defaults({ items: [], tags:[], user: {}, count: 0 })
+db.defaults({ items: [], tags:[], collections:[], user: {}, count: 0 })
   .write()
 
 db.set('user.name', 'harry')
     .write()
-    
+
 module.exports = db

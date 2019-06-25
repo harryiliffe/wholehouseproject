@@ -3,16 +3,43 @@
  *
  */
 
-.twitter-typeahead .tt-query,
-.twitter-typeahead .tt-hint {
-    margin-bottom: 0;
+ .twitter-typeahead .tt-query,
+ .twitter-typeahead .tt-hint {
+     margin-bottom: 0;
+ }
+
+ .twitter-typeahead .tt-hint
+ {
+     display: none;
+ }
+
+
+ :not(.bootstrap-tagsinput) .twitter-typeahead{
+   width: 100%;
+ }
+
+.bootstrap-tagsinput .twitter-typeahead {
+  width: auto;
 }
 
-.twitter-typeahead .tt-hint
+.twitter-typeahead .tt-input
 {
-    display: none;
+  border: none;
+  box-shadow: none;
+  outline: none;
+  background-color: transparent;
+  margin: 0;
+
 }
 
+.bootstrap-tagsinput .twitter-typeahead .tt-input {
+  min-width: 50px;
+  width: auto;
+  max-width: inherit;
+}
+:not(.bootstrap-tagsinput) .twitter-typeahead .tt-input {
+  width: 100%;
+}
 
 .tt-menu {
     position: absolute;
