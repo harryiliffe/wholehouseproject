@@ -69,17 +69,23 @@ router.post('/', function (req, res) {
   if(Array.isArray(photos)){
     console.log("Multiple files detected")
   } else if (photos.type != "application/octet-stream"){
-    n = "";
-    while(fs.existsSync(path.join(folder, item.title + n+".jpg"))){
-      n => n + 1;
+    n = 0;
+    while(fs.existsSync(path.join(folder, item.title + "-" + n + ".jpg"))){
+      console.log(path.join(folder, item.title + n+".jpg"))
+      n = n + 1;
     }
-    fs.rename(photos.path, path.join(folder, item.title + n+".jpg"));
+    fs.rename(photos.path, path.join(folder, item.title + "-" + n + ".jpg"));
 
+    if(!db.get("items").getById(item.id).get("imagePaths").value()){
+      db.get("items")
+        .getById(item.id)
+        .assign({imagePaths:[]})
+        .write();
+    }
     db.get("items")
       .getById(item.id)
-      .assign({imagePath:[]})
-      .get("imagePath")
-      .push(path.join('/images/',item.id, item.title + n+".jpg"))
+      .get("imagePaths")
+      .push(path.join("/images/"+item.id, item.title + "-" + n + ".jpg"))
       .write();
   }
 

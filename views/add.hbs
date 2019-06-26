@@ -1,3 +1,21 @@
+<div class="modal fade" id="imageVeiwer" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog centered" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+
+        <img src="" class="img-fluid">
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-danger">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
 <form class="col-12"  id="form"  enctype="multipart/form-data">
 
   <div class="alert alert-danger" role="alert" id="warningAlert" style="display: None; opacity:0;">
@@ -37,7 +55,16 @@
   </div>
 
   <div class="form-group">
-    <label>Add Files</label><br/>
+    <label>Images</label><br/>
+    <div class="form-control" id="imageThumbs" style="display:flex;flex-wrap:wrap;max-height:300px;height:auto;overflow:scroll;">
+
+        {{#each item.imagePaths}}
+          <div class="p-2 col-6 col-sm-4 col-md-3 col-lg-2">
+            <img src="{{this}}" class="img-thumbnail" data-toggle="modal" data-target="#imageVeiwer" data-image="{{this}}" data-uploaded="true">
+          </div>
+        {{/each}}
+
+    </div>
     <button type="button" onclick="$('#imgupload').trigger('click');" class="btn btn-outline-primary">Browse&hellip;</button>
     <div class="file-names small"></div>
 
@@ -58,6 +85,15 @@
 
 <script>
 
+//POPup on imageclick
+$('#imageVeiwer').on('show.bs.modal', function (event) {
+  var image = $(event.relatedTarget) // Button that triggered the modal
+  var modal = $(this)
+  modal.find('.modal-body img').attr("src", image.data('image'));
+})
+
+
+//THROUGHS ERROR IF INVALID ID
 $(document).ready( function() {
   if("{{invalidID}}" != ""){
     window.history.replaceState(null,null,"/add");
@@ -71,7 +107,7 @@ $(document).ready( function() {
 });
 
 
-
+//CALLED WHEN FORM IS SUBMITTED
 function SubForm (formReset){
     var itemID = new URLSearchParams(window.location.search).get('itemID');
     var form = document.getElementById('form');
@@ -87,7 +123,7 @@ function SubForm (formReset){
             if(formReset){
               tagList.add(res.tagList);
               collectionList.add(res.collectionList);
-              
+
               window.history.replaceState(null,null,"/add?itemID="+res.item.id);
               window.history.pushState(null,null,"/add");
 
@@ -103,6 +139,7 @@ function SubForm (formReset){
               }, 2000);
 
             } else {
+              window.history.replaceState(null,null,"/add?itemID="+res.item.id);
               window.location.href = "/view/object?itemID="+res.item.id;
             }
         },
@@ -112,27 +149,22 @@ function SubForm (formReset){
     });
 }
 
+//CALLED WHEN FILE ADDED
 $(document).on('change', ':file', function() {
-    var input = $(this),
-        numFiles = input.get(0).files ? input.get(0).files.length : 1,
-        label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
-    input.trigger('fileselect', [numFiles, label]);
+    var files = $(this).get(0).files;
+    var filePreviews = $('#imageThumbs');
+    //delete old files
+    filePreviews.find('[data-uploaded="false"]').remove();
+    //add new files
+    for(let file of files){
+      let reader = new FileReader();
+      reader.onload = function (e) {
+          filePreviews.append('<div class="p-2 col-6 col-sm-4 col-md-3 col-lg-2"><img src="'+e.target.result+'" class="img-thumbnail border-success" data-toggle="modal" data-target="#imageVeiwer" data-image="'+e.target.result+'" data-uploaded="false"></div>');
+      }
+      reader.readAsDataURL(file);
+    }
 });
 
-$(document).ready( function() {
-    $(':file').on('fileselect', function(event, numFiles, label) {
-        console.log(numFiles);
-        console.log(label);
-        var input = $(this).parents('.form-group').find('.file-names'),
-              log = numFiles > 1 ? numFiles + ' files selected' : label;
-
-          if( input.length ) {
-              input.html(log);
-          } else {
-              if( log ) alert(log);
-          }
-    });
-});
 //=======COLLECTION========
 var collectionList = new Bloodhound({
   local: {{{default collectionList "[]"}}},
