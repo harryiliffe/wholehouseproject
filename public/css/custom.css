@@ -18,3 +18,24 @@
     cursor: inherit;
     display: block;
 }
+
+.btnCheckbox > .btn-outline-primary:hover {
+  color: #0069d9;
+  border-color: #0069d9;
+  background-color: transparent;
+}
+.btnCheckbox > .btn-primary:hover {
+  /* background-color: #007bff; */
+  /* border-color: #007bff; */
+}
+
+@media (hover: none) {
+  .btnCheckbox > .btn-outline-primary:hover {
+    color: #007bff;
+    background-color: transparent;
+  }
+  .btnCheckbox > .btn-primary:hover {
+    background-color: #007bff;
+    border-color: #007bff;
+  }
+}

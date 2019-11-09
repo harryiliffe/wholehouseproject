@@ -27,8 +27,8 @@ router.get('/', function (req, res) {
   }
   res.render('add', {
     item: item,
-    tagList: JSON.stringify(db.get("tags")),
-    collectionList: JSON.stringify(db.get("collections")),
+    tagList: JSON.stringify(db.get("items").flatMap("tags").uniq()),
+    collectionList: JSON.stringify(db.get("items").flatMap("collection").uniq()),
     submitAlert: item ?  "Object Successfully Updated" : "New Object Successfully Submitted",
     invalidID: req.query.itemID && !item ? "Invalid itemID" : ""
   });
@@ -42,8 +42,8 @@ router.post('/', function (req, res) {
   tagArray = data.tags.split(",");
   data.tags = tagArray;
 
-  db.set("tags", db.get("tags").union(tagArray).value()).write();
-  db.set("collections", db.get("collections").union([data.collection]).value()).write();
+  // db.set("tags", db.get("tags").union(tagArray).value()).write();
+  // db.set("collections", db.get("collections").union([data.collection]).value()).write();
 
   //add data to db
   if(data.itemID){
@@ -90,7 +90,7 @@ router.post('/', function (req, res) {
   }
 
   console.log("Data Received. Added Item: " + item.id);
-  res.send({"item":item,"tags":db.get("tags").value()});
+  res.send({"item":item,"tags":db.get("items").flatMap("tags").uniq().value()});
 
 });
 

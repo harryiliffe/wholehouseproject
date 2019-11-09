@@ -13,7 +13,6 @@ router.get("/object", function(req, res) {
   console.log("Serving "+item.id+ " to be veiwed.")
   res.render('view', {
     title: "Whole House Project",
-    name: "Harry",
     item: item
   });
 });

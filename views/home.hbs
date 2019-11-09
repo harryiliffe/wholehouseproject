@@ -1,9 +1,11 @@
-<div class="card-deck">
+<div class="alert alert-secondary" id="objectsShown" style="display:none;width:100%" role="alert">
+</div>
+<div class="row" id="objectCards">
   {{#each items}}
-    <div class="col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 m-0 p-0 d-flex">
-      <div class="card m-2" style="">
-        {{#if imagePath}}
-          <img src="{{imagePath}}" class="card-img-top" style="max-height:200px;object-fit: cover;
+    <div class="card-container col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 m-0 p-0">
+      <div class="card m-2" style="" id={{id}} tags="{{tags}}" collections="{{collection}}">
+        {{#if imagePaths.[0]}}
+          <img src="{{imagePaths.[0]}}" class="card-img-top" style="max-height:200px;object-fit: cover;
     object-position: center;" alt="{{title}}">
         {{/if}}
         <div class="card-body d-flex flex-column">
@@ -20,3 +22,54 @@
     </div>
   {{/each}}
 </div>
+
+<script>
+$.expr[":"].containsNoCase = function(el, i, m) {
+    var search = m[3];
+    if (!search) return false;
+    return eval("/" + search + "/i").test($(el).text());
+};
+
+$('#searchbox-input').keyup( function () {
+    $('.card').parent().show();
+    var filter = $(this).val(); // get the value of the input, which we filter on
+    if(filter!==""){
+      $('#objectCards').find(".card-title:not(:containsNoCase(" + filter + "))").closest(".card-container").hide();
+    }
+
+});
+
+$("#collectionSelect, #tagSelect").find("input").change(function(){
+  updateConditionalDisplay();
+  let objectsShowing = $(".card").filter(":visible").length
+  if (objectsShowing !=$(".card").length){
+    $("#objectsShown").text("Showing " + objectsShowing + " object" + (objectsShowing===1 ? "." : "s."));
+    $("#objectsShown").show();
+  } else {
+    $("#objectsShown").hide();
+  }
+});
+
+
+function updateConditionalDisplay(){
+  $(".card").parent().hide();
+  $(".card").filter(function(){return attrArrayFilter($(this),"tags", tagFilter)})
+            // .filter(function(){return attrArrayFilter($(this),"collections", collectionFilter)})
+            .parent().show();
+}
+
+function attrArrayFilter(obj, attr, array){
+  let bool=0;
+  if (typeof($(obj).attr(attr))!='undefined'){
+    attrArray = $(obj).attr(attr).split(',');
+    _.forEach(attrArray, function(value){
+      if( _.includes(array,value)){
+        bool+=1;
+      };
+    });
+    return bool === array.length;
+  } else {
+    return 0;
+  }
+}
+</script>
