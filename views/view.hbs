@@ -1,30 +1,83 @@
 
 <div class="col-12 col-md-4 mb-3">
-  {{#if item.title}}
-  <h2>{{item.title}}</h2>
-  {{/if}}
+  <style>
+    table, th, td {
+      border: 1px solid black;
+      border-collapse: separate;
+      border-spacing: 5px;
+    }
+    table {
+      border: none;
+    }
+    th, td {
+      padding: 15px;
+    }
+    svg#barcode {
+      width: 100%;
+      height: auto;
+      max-height: 125px;
+    }
+  </style>
+  <script>
+    window.onload = function () {
+      JsBarcode("#barcode", "{{item.id}}");
+    }
+  </script>
+  <table class="w-100">
+    <tr>
+      <td colspan="2">
+        {{#if item.title}}
+        <h2>{{item.title}}</h2>
+        {{/if}}
+      </td>
+    </tr>
+    <tr>
+      {{#if item.collection}}
+      <td>
+        <strong>Collection: </strong>
+      </td>
+      <td>
+        {{capitalize item.collection}}
+      </td>
+      {{/if}}
+    </tr>
+    <tr>
+      {{#if item.description}}
+      <td colspan="2">
+        {{item.description}}
+      </td>
+      {{/if}}
+    </tr>
+    <tr>
+      {{#if item.dateAcquired}}
+      <td>
+        <strong>Date acquired: </strong>
+      </td>
+      <td>
+        {{item.dateAcquired}}
+      </td>
+      {{/if}}
+    </tr>
+    <tr>
+      <td colspan="2">
+        {{#if item.tags}}
+        <div class="mx-auto" style="width: fit-content;">
+          {{#each item.tags}}
+            <span class="badge badge-secondary">{{capitalize this}}</span>
+          {{/each}}
+        </div>
+        {{/if}}
+      </td>
+    </tr>
+    <tr>
+      <td colspan="2">
+        <svg id="barcode"></svg>
+      </td>
+    </tr>
+  </table>
 
-  {{#if item.collection}}
-  <p><strong>Collection: </strong>{{capitalize item.collection}}</p>
-  {{/if}}
 
-  {{#if item.description}}
-  <p style="white-space: pre-wrap;">{{item.description}}</p>
-  {{/if}}
-
-  {{#if item.dateAcquired}}
-  <p><strong>Date acquired: </strong>{{item.dateAcquired}}</p>
-  {{/if}}
-
-  {{#if item.tags}}
-  <div class="mb-3">
-    {{#each item.tags}}
-      <span class="badge badge-secondary">{{capitalize this}}</span>
-    {{/each}}
-  </div>
-  {{/if}}
-
-  <a class="btn btn-outline-secondary" href="/add?itemID={{item.id}}" role="button">Update</a>
+  <a class="btn btn-outline-secondary mt-3" href="/add?itemID={{item.id}}" role="button">Update</a>
 </div>
 
 <div class="col">
