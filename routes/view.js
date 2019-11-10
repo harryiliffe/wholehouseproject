@@ -13,7 +13,8 @@ router.get("/object", function(req, res) {
   console.log("Serving "+item.id+ " to be veiwed.")
   res.render('view', {
     title: "Whole House Project",
-    item: item
+    item: item,
+    photos: db.get('items').getById(req.query.itemID).get("assets").filter({type: "image"}).value()
   });
 });
 

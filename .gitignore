@@ -65,4 +65,4 @@ typings/
 db
 tmp_uploads/
 uploads/
-public/images/*
+public/assets/*

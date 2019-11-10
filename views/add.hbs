@@ -18,7 +18,7 @@
 
 <form class="col-12"  id="form"  enctype="multipart/form-data">
 
-  <div class="alert alert-danger" role="alert" id="warningAlert" style="display: None; opacity:0;">
+  <div class="alert alert-danger" role="alert" id="invalidIDAlert" style="display: None; opacity:0;">
     {{invalidID}}
   </div>
 
@@ -79,6 +79,9 @@
   <div class="alert alert-success" role="alert" id="successAlert" style="display: None; opacity:0;">
     {{submitAlert}}
   </div>
+  <div class="alert alert-danger" role="alert" id="invalidForm" style="display: None; opacity:0;">
+    Please add all required data!
+  </div>
 
 
 </form>
@@ -97,9 +100,9 @@ $('#imageVeiwer').on('show.bs.modal', function (event) {
 $(document).ready( function() {
   if("{{invalidID}}" != ""){
     window.history.replaceState(null,null,"/add");
-    $("#warningAlert").show().fadeTo(200,1);
+    $("#invalidIDAlert").show().fadeTo(200,1);
     window.setTimeout(function() {
-        $("#warningAlert").fadeTo(200, 0, function(){
+        $("#invalidIDAlert").fadeTo(200, 0, function(){
             $(this).hide();
         });
     }, 4000);
@@ -113,41 +116,50 @@ function SubForm (formReset){
     var form = document.getElementById('form');
     var formData = new FormData(form);
     if(itemID){formData.append("itemID", itemID);}
-    $.ajax({
-        url: '/add',
-        type: 'POST',
-        data: formData,
-        enctype: 'multipart/form-data',
-        success: function (res) {
-            console.log("Form Submited");
-            if(formReset){
-              tagList.add(res.tagList);
-              collectionList.add(res.collectionList);
+    if (!form.checkValidity()){
+      $("#invalidForm").show().fadeTo(200,1);
+      window.setTimeout(function() {
+          $("#invalidIDAlert").fadeTo(200, 0, function(){
+              $(this).hide();
+          });
+      }, 4000);
+    } else {
+      $.ajax({
+          url: '/add',
+          type: 'POST',
+          data: formData,
+          enctype: 'multipart/form-data',
+          success: function (res) {
+              console.log("Form Submited");
+              if(formReset){
+                tagList.add(res.tagList);
+                collectionList.add(res.collectionList);
 
-              window.history.replaceState(null,null,"/add?itemID="+res.item.id);
-              window.history.pushState(null,null,"/add");
+                window.history.replaceState(null,null,"/add?itemID="+res.item.id);
+                window.history.pushState(null,null,"/add");
 
-              //clears form
-              $("input,textarea").each(function(){this.value=""});
-              $('.tagsinput').tagsinput('removeAll');
+                //clears form
+                $("input,textarea").each(function(){this.value=""});
+                $('.tagsinput').tagsinput('removeAll');
 
-              $("#successAlert").show().fadeTo(200,1);
-              window.setTimeout(function() {
-                  $("#successAlert").fadeTo(200, 0, function(){
-                      $(this).hide();
-                  });
-              }, 2000);
+                $("#successAlert").show().fadeTo(200,1);
+                window.setTimeout(function() {
+                    $("#successAlert").fadeTo(200, 0, function(){
+                        $(this).hide();
+                    });
+                }, 2000);
 
-            } else {
-              window.history.replaceState(null,null,"/add?itemID="+res.item.id);
-              window.location.href = "/view/object?itemID="+res.item.id;
-            }
-        },
-        cache: false,
-        contentType: false,
-        processData: false
-    });
-}
+              } else {
+                window.history.replaceState(null,null,"/add?itemID="+res.item.id);
+                window.location.href = "/view/object?itemID="+res.item.id;
+              }
+          },
+          cache: false,
+          contentType: false,
+          processData: false
+      });
+    }
+  }
 
 //CALLED WHEN FILE ADDED
 $(document).on('change', ':file', function() {

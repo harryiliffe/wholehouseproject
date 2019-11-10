@@ -20,7 +20,11 @@
   </style>
   <script>
     window.onload = function () {
-      JsBarcode("#barcode", "{{item.id}}");
+      JsBarcode("#barcode", "{{item.id}}", {
+        displayValue: true,
+        height:50,
+        font: "Helvetica Neue"
+      });
     }
   </script>
   <table class="w-100">
@@ -81,18 +85,18 @@
 </div>
 
 <div class="col">
-  {{#if item.imagePaths}}
+  {{#if photos}}
   <div id="carousel" class="carousel slide" data-ride="carousel">
     <ol class="carousel-indicators">
-      {{#eachIndex item.imagePaths}}
-        <li data-target="#carousel" data-slide-to="{{index}}" {{#unless index}}class="active"{{/unless}}></li>
+      {{#eachIndex photos}}
+          <li data-target="#carousel" data-slide-to="{{index}}" {{#unless index}}class="active"{{/unless}}></li>
       {{/eachIndex}}
     </ol>
     <div class="carousel-inner">
-      {{#eachIndex item.imagePaths}}
-        <div class="carousel-item{{#unless index}} active{{/unless}}">
-          <img src="{{item}}" class="d-block w-100">
-        </div>
+      {{#eachIndex photos}}
+          <div class="carousel-item{{#unless index}} active{{/unless}}">
+            <img src="{{item.path}}" class="d-block w-100">
+          </div>
       {{/eachIndex}}
     <a class="carousel-control-prev" href="#carousel" role="button" data-slide="prev">
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>

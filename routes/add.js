@@ -42,9 +42,6 @@ router.post('/', function (req, res) {
   tagArray = data.tags.split(",");
   data.tags = tagArray;
 
-  // db.set("tags", db.get("tags").union(tagArray).value()).write();
-  // db.set("collections", db.get("collections").union([data.collection]).value()).write();
-
   //add data to db
   if(data.itemID){
     item = db.get("items")
@@ -56,36 +53,40 @@ router.post('/', function (req, res) {
              .insert(data)
              .write();
   }
-
-  //proccess files
+  //====== proccess files ======
   const photos = req.files.photos
   //make directory
-  folder = path.join( 'public/images/' +item.id)
+  folder = path.join( 'public/assets/' +item.id)
   if(!fs.existsSync(folder)){
-    fs.mkdir(folder);
+    fs.mkdirSync(folder);
+  }
+
+  //make the "assests" db
+  if(!db.get("items").getById(item.id).get("assets").value()){
+    assetsDB = db.get("items")
+                .getById(item.id)
+                .assign({assets:[]})
+                .get("assets");
+    assetsDB.write();
+  } else {
+    assetsDB = db.get("items")
+                .getById(item.id)
+                .get("assets");
   }
 
   //move files
   if(Array.isArray(photos)){
     console.log("Multiple files detected")
   } else if (photos.type != "application/octet-stream"){
-    n = 0;
-    while(fs.existsSync(path.join(folder, item.title + "-" + n + ".jpg"))){
-      console.log(path.join(folder, item.title + n+".jpg"))
-      n = n + 1;
-    }
-    fs.rename(photos.path, path.join(folder, item.title + "-" + n + ".jpg"));
 
-    if(!db.get("items").getById(item.id).get("imagePaths").value()){
-      db.get("items")
-        .getById(item.id)
-        .assign({imagePaths:[]})
-        .write();
-    }
-    db.get("items")
-      .getById(item.id)
-      .get("imagePaths")
-      .push(path.join("/images/"+item.id, item.title + "-" + n + ".jpg"))
+    image = assetsDB.insert({type:"image"})
+            .write();
+
+    newPath = path.join(folder, item.title + "-"+ image.id + ".jpg")
+    fs.renameSync(photos.path, newPath);
+
+    assetsDB.getById(image.id)
+      .assign({path:path.join('/assets' ,item.id, item.title + "-"+ image.id + ".jpg")})
       .write();
   }
 
