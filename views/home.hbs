@@ -1,5 +1,10 @@
 <div class="alert alert-secondary" id="objectsShown" style="display:none;width:100%" role="alert">
 </div>
+
+<div class="alert alert-warning" id="noObjects" style="display:none;width:100%" role="alert">
+No objects to show. Try <a href="/add" class="text-secondary">adding some.</a>
+</div>
+
 <div class="row" id="objectCards">
   {{#each items}}
     <div class="card-container col-xl-2 col-lg-3 col-md-4 col-sm-6 col-12 m-0 p-0">
@@ -24,6 +29,12 @@
 </div>
 
 <script>
+
+$(document).ready( function() {
+  if($("#objectCards").children().length == 0)
+  $("#noObjects").show().fadeTo(200,1);
+});
+
 $.expr[":"].containsNoCase = function(el, i, m) {
     var search = m[3];
     if (!search) return false;

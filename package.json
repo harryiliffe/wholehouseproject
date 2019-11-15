@@ -17,6 +17,7 @@
     "file-type": "^11.1.0",
     "formidable": "^1.2.1",
     "handlebars-helpers": "^0.10.0",
+    "jsbarcode": "^3.11.0",
     "lodash": "^4.17.11",
     "lodash-id": "^0.14.0",
     "lowdb": "^1.0.0",

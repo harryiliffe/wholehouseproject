@@ -15,7 +15,7 @@ router.get('/', function (req, res) {
       user: user,
       items: items,
       navSearch: true,
-      tagList: db.get("items").flatMap("tags").uniq().value(),//db.get("tags").value(),
+      tagList: db.get("items").flatMap("tags").uniq().value(),
       collectionList: db.get("items").flatMap("collection").uniq().value()
     });
 });

@@ -18,6 +18,25 @@ function isEmpty(obj) {
 
 //=========Routes=========//
 
+
+//=====DELETE IMAGE=====//
+router.delete("/", function (req, res) {
+  const data = req.fields;
+  imageDB = db.get('items')
+              .getById(data.itemID)
+              .get("assets");
+  image = imageDB.getById(data.imageID).value();
+
+  console.log("Removing Image: " + image.id);
+  fs.unlink(path.join("public",image.path), function(err){
+    if(err){
+      console.log(err);
+    }
+    imageDB.remove({id:data.imageID}).write();
+    res.send("Success");
+  });
+});
+
 router.get('/', function (req, res) {
   var item;
   if(req.query.itemID){
@@ -29,6 +48,7 @@ router.get('/', function (req, res) {
     item: item,
     tagList: JSON.stringify(db.get("items").flatMap("tags").uniq()),
     collectionList: JSON.stringify(db.get("items").flatMap("collection").uniq()),
+    photos: db.get('items').getById(req.query.itemID).get("assets").filter({type: "image"}).value(),
     submitAlert: item ?  "Object Successfully Updated" : "New Object Successfully Submitted",
     invalidID: req.query.itemID && !item ? "Invalid itemID" : ""
   });

@@ -1,4 +1,4 @@
-<div class="modal fade" id="imageVeiwer" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="imageVeiwer" tabindex="-1" role="dialog" aria-labelledby="imageVeiwer" aria-hidden="true">
   <div class="modal-dialog centered" role="document">
     <div class="modal-content">
       <div class="modal-body">
@@ -8,7 +8,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-danger">Delete</button>
+        <button type="button" class="btn btn-danger" onClick="removeImage()">Delete</button>
       </div>
     </div>
   </div>
@@ -58,9 +58,9 @@
     <label>Images</label><br/>
     <div class="form-control" id="imageThumbs" style="display:flex;flex-wrap:wrap;max-height:300px;height:auto;overflow:scroll;">
 
-        {{#each item.imagePaths}}
+        {{#each photos}}
           <div class="p-2 col-6 col-sm-4 col-md-3 col-lg-2">
-            <img src="{{this}}" class="img-thumbnail" data-toggle="modal" data-target="#imageVeiwer" data-image="{{this}}" data-uploaded="true">
+            <img src="{{this.path}}" id="{{this.id}}" class="img-thumbnail" data-toggle="modal" data-target="#imageVeiwer" data-image="{{this.path}}" data-uploaded="true">
           </div>
         {{/each}}
 
@@ -93,6 +93,7 @@ $('#imageVeiwer').on('show.bs.modal', function (event) {
   var image = $(event.relatedTarget) // Button that triggered the modal
   var modal = $(this)
   modal.find('.modal-body img').attr("src", image.data('image'));
+  modal.find('.modal-body img').attr("id", image.attr('id'));
 })
 
 
@@ -109,6 +110,28 @@ $(document).ready( function() {
   }
 });
 
+function removeImage(){
+  var image = $('#imageThumbs').find('[src="'+$("#imageVeiwer").find("img").attr("src")+'"]');
+  console.log(image.attr("data-uploaded"));
+  if(image.attr("data-uploaded")=="true"){
+    console.log("Image is uploaded. Deleting from server.")
+    var itemID = new URLSearchParams(window.location.search).get('itemID');
+    var imageID = image.attr("id");
+    var data = {"imageID":imageID, "itemID":itemID};
+    $.ajax({
+      url: '/add',
+      type: 'DELETE',
+      data: data,
+      success: function (res) {
+        $("#imageVeiwer").modal('hide');
+        image.remove();
+      }
+
+    })
+  } else {
+    image.remove();
+  }
+}
 
 //CALLED WHEN FORM IS SUBMITTED
 function SubForm (formReset){
@@ -171,7 +194,7 @@ $(document).on('change', ':file', function() {
     for(let file of files){
       let reader = new FileReader();
       reader.onload = function (e) {
-          filePreviews.append('<div class="p-2 col-6 col-sm-4 col-md-3 col-lg-2"><img src="'+e.target.result+'" class="img-thumbnail border-success" data-toggle="modal" data-target="#imageVeiwer" data-image="'+e.target.result+'" data-uploaded="false"></div>');
+          filePreviews.append('<div class="p-2 col-6 col-sm-4 col-md-3 col-lg-2"><img src="'+e.target.result+'" class="img-thumbnail border-success" data-toggle="modal" data-target="#imageVeiwer" data-image="'+e.target.result+'" data-uploaded=false></div>');
       }
       reader.readAsDataURL(file);
     }
