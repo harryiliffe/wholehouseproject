@@ -68,8 +68,14 @@ router.post('/', function (req, res) {
   const userdb = db.get("userdata").find({"user":sess.user});
   //process tags
   //parse tagString
-  tagArray = data.tags.split(",");
-  data.tags = tagArray;
+  if(data.tags){
+    tagArray = data.tags.split(",");
+    data.tags = tagArray;
+  }
+  if(data.materials){
+    materialsArray = data.materials.split(",");
+    data.materials = materialsArray;
+  }
 
   //add data to db(sess.user)
   if(data.itemID){
@@ -105,23 +111,27 @@ router.post('/', function (req, res) {
 
   //move files
   if(Array.isArray(photos)){
-    console.log("Multiple files detected")
+    for(var i = 0; i<photos.length;i++){
+      uploadPhoto(photos[i], assetsDB, item);
+    }
   } else if (photos.type != "application/octet-stream"){
+    uploadPhoto(photos, assetsDB, item);
+  }
 
+  console.log("Data Received. Added Item: " + item.id);
+  res.send({"item":item,"tags":userdb.get("items").flatMap("tags").uniq().value()});
+
+});
+
+function uploadPhoto(photo, assetsDB, item){
     image = assetsDB.insert({type:"image"})
             .write();
-
     newPath = path.join(folder, item.title + "-"+ image.id + ".jpg")
-    fs.renameSync(photos.path, newPath);
+    fs.renameSync(photo.path, newPath);
 
     assetsDB.getById(image.id)
       .assign({path:path.join('/assets' ,item.id, item.title + "-"+ image.id + ".jpg")})
       .write();
-  }
-
-  console.log("Data Received. Added Item: " + item.id);
-  res.send({"item":item,"tags":db(sess.user).get("items").flatMap("tags").uniq().value()});
-
-});
+}
 
 module.exports = router;

@@ -16,7 +16,7 @@
 
 
 
-<form class="col-12"  id="form"  enctype="multipart/form-data">
+<form class="col-12 needs-validation"  id="form"  enctype="multipart/form-data" novalidate>
 
   <div class="alert alert-danger" role="alert" id="invalidIDAlert" style="display: None; opacity:0;">
     {{invalidID}}
@@ -32,43 +32,94 @@
     <div class="form-control">
       <input type="text" name="collection" id="collection" placeholder="Enter object collection" value="{{item.collection}}"></input>
     </div>
+    <small class="form-text text-muted">
+      Enter a single main collection. eg socks.
+    </small>
+  </div>
+
+  <div class="form-group">
+    <label>Materiality</label>
+    <input class="materialinput" type="text" name="materials" id="materials" value="" data-role="materialsinput"/>
+    <small class="form-text text-muted">
+      Comma seperated tags for materiality and appearance.
+    </small>
   </div>
 
   <div class="form-group">
     <label for="description">Object Description</label>
     <textarea type="text" rows="3" class="form-control" name="description" id="description" placeholder="Enter object description" required style="resize:none;">{{item.description}}</textarea>
+    <small class="form-text text-muted">
+      Please also use this space to let me know what other options you need?
+    </small>
   </div>
 
-  <div class="form-group">
-    <label for="dateacquired">Date acquired</label>
-    <input type="month" class="form-control" name="dateAcquired" value="{{item.dateAcquired}}" id="dateacquired">
+  <label>Condition</label>
+  <div class="form-row">
+    <div class="form-group col-auto">
+      <select class="form-control" id="condition" name="condition" default="Poor">
+        <option>Excellent</option>
+        <option>Good</option>
+        <option>Poor</option>
+        <option>Very Poor</option>
+      </select>
+    </div>
+    <div class="form-group col">
+      <input type="text" class="form-control" name="condition-long" id="condition-long" placeholder="Condition details" value="{{item.condition-long}}"></input>
+    </div>
   </div>
 
-  <div class="form-group">
-    <label>Object Tags</label>
-    <input class="tagsinput" type="text" name="tags" id="tags" value="" data-role="tagsinput"/>
+  <label for="acquisitionmethod">Acquisition</label>
+  <div class="form-row">
+    <div class="form-group col-auto">
+      <select class="form-control" id="acquisition-method" name="acquisition-method">
+        <option>Purchased New</option>
+        <option>Purchased Secondhand</option>
+        <option>Gifted</option>
+      </select>
+    </div>
+    <div class="form-group col">
+      <input class="form-control" name="acquisition" placeholder="acquisition details">
+      </input>
+    </div>
+    <div class="form-group col">
+      <input type="month" class="form-control" name="acquisition-date" value="{{item.dateAcquired}}" id="acquisition-date">
+    </div>
   </div>
 
+
   <div class="form-group">
-    <label for="quantity">Quanitity</label>
-    <input type="number" class="form-control" name="quantity" value="{{item.quantity}}" id="quantity">
+    <label>Value</label>
+    <input class="form-control-range custom-range" type="range" name="value" id="value" min="0" max="10" value="{{item.valueRanged}}"/>
+    <small class="form-text text-muted">
+      An arbitrary scale of value from 0 to 10.
+    </small>
+  </div>
+
+
+  <div class="form-row">
+    <div class="form-group col">
+      <label>Tags</label>
+      <input class="tagsinput" type="text" name="tags" id="tags" value="" data-role="tagsinput"/>
+    </div>
+
+    <div class="form-group col-auto">
+      <label for="quantity">Quanitity</label>
+      <input type="number" class="form-control" name="quantity" value="{{item.quantity}}" id="quantity">
+    </div>
   </div>
 
   <div class="form-group">
     <label>Images</label><br/>
-    <div class="form-control" id="imageThumbs" style="display:flex;flex-wrap:wrap;max-height:300px;height:auto;overflow:scroll;">
-
+    <div class="form-control" id="imageThumbs"  style="display:flex;flex-wrap:wrap;max-height:300px;height:auto;min-height: 36px;overflow:scroll;">
+        <span id="placeholder" class="text-muted" style="{{#if photos}}display: None;{{/if}}">No images. Add some below.</span>
         {{#each photos}}
           <div class="p-2 col-6 col-sm-4 col-md-3 col-lg-2">
             <img src="{{this.path}}" id="{{this.id}}" class="img-thumbnail" data-toggle="modal" data-target="#imageVeiwer" data-image="{{this.path}}" data-uploaded="true">
           </div>
         {{/each}}
-
     </div>
-    <button type="button" onclick="$('#imgupload').trigger('click');" class="btn btn-outline-primary">Browse&hellip;</button>
-    <div class="file-names small"></div>
-
     <input type="file" name="photos" id="imgupload" style="display: none;" multiple>
+    <button type="button" onclick="$('#imgupload').trigger('click');" class="btn btn-outline-primary mt-2">Browse&hellip;</button>
   </div>
 
   <div class="form-group">
@@ -88,14 +139,6 @@
 
 <script>
 
-//POPup on imageclick
-$('#imageVeiwer').on('show.bs.modal', function (event) {
-  var image = $(event.relatedTarget) // Button that triggered the modal
-  var modal = $(this)
-  modal.find('.modal-body img').attr("src", image.data('image'));
-  modal.find('.modal-body img').attr("id", image.attr('id'));
-})
-
 
 //THROUGHS ERROR IF INVALID ID
 $(document).ready( function() {
@@ -110,9 +153,27 @@ $(document).ready( function() {
   }
 });
 
+$(document).ready( function() {
+  var selects = $("select");
+  var itemDefault = {"acquisition-method":"Purchased New", "condition": "Excellent"};
+  var item = {{{default itemJSON "itemDefault"}}};
+  for(let select of selects){
+    select.value = item[select.name];
+  }
+});
+
+//POPup on imageclick
+$('#imageVeiwer').on('show.bs.modal', function (event) {
+  var image = $(event.relatedTarget) // Button that triggered the modal
+  var modal = $(this)
+  modal.find('.modal-body img').attr("src", image.data('image'));
+  modal.find('.modal-body img').attr("id", image.attr('id'));
+})
+
+//REMOVES IMAGES VIA MODAL
 function removeImage(){
   var image = $('#imageThumbs').find('[src="'+$("#imageVeiwer").find("img").attr("src")+'"]');
-  console.log(image.attr("data-uploaded"));
+
   if(image.attr("data-uploaded")=="true"){
     console.log("Image is uploaded. Deleting from server.")
     var itemID = new URLSearchParams(window.location.search).get('itemID');
@@ -124,14 +185,36 @@ function removeImage(){
       data: data,
       success: function (res) {
         $("#imageVeiwer").modal('hide');
-        image.remove();
+        image.parent().remove();
       }
-
     })
   } else {
-    image.remove();
+    $("#imageVeiwer").modal('hide');
+    image.parent().remove();
+  }
+  if ($('#imageThumbs').find("img").length == 0){
+    $("#placeholder").show();
   }
 }
+
+
+//CALLED WHEN FILE ADDED
+$(document).on('change', ':file', function() {
+    var files = $(this).get(0).files;
+    var filePreviews = $('#imageThumbs');
+    //delete old files
+    filePreviews.find('[data-uploaded="false"]').parent().remove();
+    //add new files
+    $("#placeholder").hide();
+    for(let file of files){
+      let reader = new FileReader();
+      reader.onload = function (e) {
+          filePreviews.append('<div class="p-2 col-6 col-sm-4 col-md-3 col-lg-2"><img src="'+e.target.result+'" class="img-thumbnail border-success" data-toggle="modal" data-target="#imageVeiwer" data-image="'+e.target.result+'" data-uploaded=false></div>');
+      }
+      reader.readAsDataURL(file);
+    }
+});
+
 
 //CALLED WHEN FORM IS SUBMITTED
 function SubForm (formReset){
@@ -141,6 +224,7 @@ function SubForm (formReset){
     if(itemID){formData.append("itemID", itemID);}
     if (!form.checkValidity()){
       $("#invalidForm").show().fadeTo(200,1);
+      form.classList.add('was-validated');
       window.setTimeout(function() {
           $("#invalidIDAlert").fadeTo(200, 0, function(){
               $(this).hide();
@@ -184,21 +268,6 @@ function SubForm (formReset){
     }
   }
 
-//CALLED WHEN FILE ADDED
-$(document).on('change', ':file', function() {
-    var files = $(this).get(0).files;
-    var filePreviews = $('#imageThumbs');
-    //delete old files
-    filePreviews.find('[data-uploaded="false"]').remove();
-    //add new files
-    for(let file of files){
-      let reader = new FileReader();
-      reader.onload = function (e) {
-          filePreviews.append('<div class="p-2 col-6 col-sm-4 col-md-3 col-lg-2"><img src="'+e.target.result+'" class="img-thumbnail border-success" data-toggle="modal" data-target="#imageVeiwer" data-image="'+e.target.result+'" data-uploaded=false></div>');
-      }
-      reader.readAsDataURL(file);
-    }
-});
 
 //=======COLLECTION========
 var collectionList = new Bloodhound({
@@ -229,7 +298,25 @@ $('#tags').tagsinput({
 
 var existingTags = {{{stringify (default item.tags "")}}}
 for(var i=0;i<existingTags.length;i++){
-  $('.tagsinput').tagsinput("add",existingTags[i]);
+  $('#tags').tagsinput("add",existingTags[i]);
 }
-// $('#OpenImgUpload').click(function(){ $('#imgupload').trigger('click'); });
+
+//=======MATERIALITY========
+var materialList = new Bloodhound({
+  local: {{{default materialList []}}},
+  datumTokenizer: Bloodhound.tokenizers.whitespace,
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+});
+
+$('#materials').tagsinput({
+  typeaheadjs: {
+    name: "Materiality",
+    source: materialList.ttAdapter()
+  }
+});
+
+var existingMaterials = {{{stringify (default item.materials "")}}}
+for(var i=0;i<existingMaterials.length;i++){
+  $('#materials').tagsinput("add",existingMaterials[i]);
+}
 </script>

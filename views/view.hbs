@@ -1,7 +1,7 @@
 
 <div class="col-12 col-md-4 mb-3">
   <style>
-    table, th, td {
+    table, td{
       border: 1px solid black;
       border-collapse: separate;
       border-spacing: 5px;
@@ -21,65 +21,101 @@
   <script>
     window.onload = function () {
       JsBarcode("#barcode", "{{item.id}}", {
-        displayValue: true,
-        height:50,
-        font: "Helvetica Neue"
+        displayValue: false,
+        height:30,
+        margin:0,
+        font: "Helvetica Neue",
+        format: "CODE39"
       });
     }
   </script>
   <table class="w-100">
-    <tr>
+    <tr id="title">
       <td colspan="2">
-        {{#if item.title}}
         <h2>{{item.title}}</h2>
-        {{/if}}
       </td>
     </tr>
-    <tr>
-      {{#if item.collection}}
+
+    {{#if item.collection}}
+    <tr id="collection">
       <td>
         <strong>Collection: </strong>
       </td>
       <td>
         {{capitalize item.collection}}
       </td>
-      {{/if}}
     </tr>
-    <tr>
-      {{#if item.description}}
+    {{/if}}
+
+    <tr id="description">
       <td colspan="2">
         {{item.description}}
       </td>
-      {{/if}}
     </tr>
-    <tr>
-      {{#if item.dateAcquired}}
-      <td>
-        <strong>Date acquired: </strong>
+
+    <tr id="acquisition">
+      <td class="align-baseline">
+        <strong>Acquisition: </strong>
       </td>
       <td>
-        {{item.dateAcquired}}
+        {{item.acquisition-method}}
+        {{item.acquisition}}<br/>
+        {{item.acquisition-date}}
       </td>
-      {{/if}}
     </tr>
-    <tr>
-      <td colspan="2">
-        {{#if item.tags}}
-        <div class="mx-auto" style="width: fit-content;">
-          {{#each item.tags}}
-            <span class="badge badge-secondary">{{capitalize this}}</span>
-          {{/each}}
-        </div>
+
+    <tr id="condition">
+      <td class="align-baseline">
+        <strong>Condition:</strong>
+      </td>
+
+      <td>
+        {{item.condition}}</br>
+        {{#if item.condition-long}}
+        {{item.condition-long}}
         {{/if}}
       </td>
     </tr>
+
     <tr>
-      <td colspan="2">
-        <svg id="barcode"></svg>
+      <td>
+        <strong>Value:</strong>
       </td>
+      <td>
+        {{item.value}}
+      </td>
+    </tr>
+
+    <tr id="attributes">
+      {{#if item.tags}}
+        <td colspan="2">
+          <span id="tags">
+            {{#each item.tags}}
+              <span class="badge badge-secondary">{{capitalize this}}</span>
+            {{/each}}
+          </span>
+      {{/if}}
+      {{#unless item.materials}}
+        </td>
+      {{/unless}}
+      {{#if item.materials}}
+          <span id="materials">
+            {{#each item.materials}}
+              <span class="badge badge-secondary">{{capitalize this}}</span>
+            {{/each}}
+          </span>
+        </td>
+      {{/if}}
+      {{#unless item.tags}}
+        </td>
+      {{/unless}}
     </tr>
   </table>
 
+  <div id="barcodeContainer" class="p-2">
+    <svg id="barcode"></svg>
+    <strong>Item ID:</strong> {{item.id}}
+  </div>
 
   <a class="btn btn-outline-secondary mt-3" href="/add?itemID={{item.id}}" role="button">Update</a>
 </div>
