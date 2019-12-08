@@ -22,7 +22,9 @@ function isEmpty(obj) {
 //=====DELETE IMAGE=====//
 router.delete("/", function (req, res) {
   const data = req.fields;
-  imageDB = db.get('items')
+  const sess = req.session;
+  const userdb = db.get("userdata").find({"user":sess.user});
+  imageDB = userdb.get('items')
               .getById(data.itemID)
               .get("assets");
   image = imageDB.getById(data.imageID).value();
@@ -39,16 +41,22 @@ router.delete("/", function (req, res) {
 
 router.get('/', function (req, res) {
   var item;
+  const sess = req.session;
+  const userdb = db.get("userdata").find({"user":sess.user});
   if(req.query.itemID){
-    item = db.get('items')
+    item = userdb.get('items')
              .getById(req.query.itemID)
              .value();
+    photos = userdb.get('items').getById(req.query.itemID).get("assets").filter({type: "image"}).value();
   }
   res.render('add', {
     item: item,
-    tagList: JSON.stringify(db.get("items").flatMap("tags").uniq()),
-    collectionList: JSON.stringify(db.get("items").flatMap("collection").uniq()),
-    photos: db.get('items').getById(req.query.itemID).get("assets").filter({type: "image"}).value(),
+    itemJSON: JSON.stringify(item),
+    user: sess.user,
+    tagList: JSON.stringify(userdb.get("items").flatMap("tags").uniq()),
+    materialList: JSON.stringify(userdb.get("items").flatMap("materials").uniq()),
+    collectionList: JSON.stringify(userdb.get("items").flatMap("collection").uniq()),
+    photos: req.query.itemID ? userdb.get('items').getById(req.query.itemID).get("assets").filter({type: "image"}).value() : "",
     submitAlert: item ?  "Object Successfully Updated" : "New Object Successfully Submitted",
     invalidID: req.query.itemID && !item ? "Invalid itemID" : ""
   });
@@ -56,20 +64,21 @@ router.get('/', function (req, res) {
 
 router.post('/', function (req, res) {
   const data = req.fields
-
+  const sess = req.session;
+  const userdb = db.get("userdata").find({"user":sess.user});
   //process tags
   //parse tagString
   tagArray = data.tags.split(",");
   data.tags = tagArray;
 
-  //add data to db
+  //add data to db(sess.user)
   if(data.itemID){
-    item = db.get("items")
+    item = userdb.get("items")
              .getById(data.itemID)
              .assign(data)
              .write();
   } else {
-    item = db.get('items')
+    item = userdb.get('items')
              .insert(data)
              .write();
   }
@@ -81,15 +90,15 @@ router.post('/', function (req, res) {
     fs.mkdirSync(folder);
   }
 
-  //make the "assests" db
-  if(!db.get("items").getById(item.id).get("assets").value()){
-    assetsDB = db.get("items")
+  //make the "assests" db(sess.user)
+  if(!userdb.get("items").getById(item.id).get("assets").value()){
+    assetsDB = userdb.get("items")
                 .getById(item.id)
                 .assign({assets:[]})
                 .get("assets");
     assetsDB.write();
   } else {
-    assetsDB = db.get("items")
+    assetsDB = userdb.get("items")
                 .getById(item.id)
                 .get("assets");
   }
@@ -111,7 +120,7 @@ router.post('/', function (req, res) {
   }
 
   console.log("Data Received. Added Item: " + item.id);
-  res.send({"item":item,"tags":db.get("items").flatMap("tags").uniq().value()});
+  res.send({"item":item,"tags":db(sess.user).get("items").flatMap("tags").uniq().value()});
 
 });
 

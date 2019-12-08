@@ -5,10 +5,19 @@ const exphbs = require('express-handlebars')
 const app = express()
 const routes = require('./routes/index');
 const formidableMiddleware = require('express-formidable');
-
-
+const session = require('express-session');
+const LowdbStore = require('lowdb-session-store')(session);
+const db = require('./db');
 
 //SETUP EXPRESS + HANDLEBARS
+app.use(session({
+  secret: 'oaehgajehliaehfaweoiucnweoprunpoecunrpoaecnrpoeharpoe',
+  resave: false,
+  saveUninitialized: true,
+  store: new LowdbStore(db.get('sessions'), {
+    ttl: 86400
+  })
+}))
 
 app.engine('.hbs', exphbs({
   extname: '.hbs',

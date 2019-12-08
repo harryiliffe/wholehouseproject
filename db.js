@@ -13,15 +13,11 @@ const db = low(adapter);
 
 db._.mixin(require('lodash-id'));
 db._.mixin({
-  createId: function(collectionName, doc) {
-    return shortid.generate();
-  }
+    createId: function(collectionName, doc) {
+        return shortid.generate();
+    }
 });
 
-db.defaults({ items: [], tags:[], collections:[], user: {}, count: 0 })
-  .write()
+db.defaults({sessions:[], userdata:[]}).write();
 
-db.set('user.name', 'harry')
-    .write()
-
-module.exports = db
+module.exports = db;
