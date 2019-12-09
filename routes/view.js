@@ -12,10 +12,11 @@ router.get("/object", function(req, res) {
     item = userdb.get('items')
            .getById(req.query.itemID)
            .value();
-    console.log("Serving "+item.id+ " to be veiwed.")
+    console.log(sess.user + ": Serving "+item.id+ " to be veiwed.")
     res.render('view', {
         title: "Whole House Project",
         item: item,
+	user: sess.user,
         photos: userdb.get('items').getById(req.query.itemID).get("assets").filter({type: "image"}).value()
     });
 });

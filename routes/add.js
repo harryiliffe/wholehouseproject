@@ -29,7 +29,7 @@ router.delete("/", function (req, res) {
               .get("assets");
   image = imageDB.getById(data.imageID).value();
 
-  console.log("Removing Image: " + image.id);
+  console.log(sess.user + ": Removing Image: " + image.id);
   fs.unlink(path.join("public",image.path), function(err){
     if(err){
       console.log(err);
@@ -118,7 +118,7 @@ router.post('/', function (req, res) {
     uploadPhoto(photos, assetsDB, item);
   }
 
-  console.log("Data Received. Added Item: " + item.id);
+  console.log(sess.user + ": Data Received. Added Item: " + item.id);
   res.send({"item":item,"tags":userdb.get("items").flatMap("tags").uniq().value()});
 
 });

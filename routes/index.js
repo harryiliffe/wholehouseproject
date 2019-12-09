@@ -19,6 +19,7 @@ router.get("/login", function (req, res) {
 
 router.get("/logout", function (req, res) {
     var sess = req.session;
+    console.log("New logout: " + sess.user);
     sess.user = "";
     res.render("login");
 });
@@ -31,7 +32,7 @@ router.post("/login", function (req, res) {
       db.get("userdata").push({"user":sess.user}).write();
       db.get("userdata").find({"user":sess.user}).defaults({"items": [], "tags":[], "collections":[]}).write();
     }
-    console.log(data);
+    console.log("New login: " + sess.user);
     res.redirect("/")
 });
 
