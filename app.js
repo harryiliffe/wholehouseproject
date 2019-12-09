@@ -9,6 +9,8 @@ const session = require('express-session');
 const LowdbStore = require('lowdb-session-store')(session);
 const db = require('./db');
 
+require('console-stamp')(console, 'HH:MM:ss');
+
 //SETUP EXPRESS + HANDLEBARS
 app.use(session({
   secret: 'oaehgajehliaehfaweoiucnweoprunpoecunrpoaecnrpoeharpoe',
