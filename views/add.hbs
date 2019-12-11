@@ -109,12 +109,17 @@
   </div>
 
 
-  <div class="form-group">
-    <label>Value</label>
-    <input class="form-control-range custom-range" type="range" name="value" id="value" min="0" max="10" value="{{item.valueRanged}}"/>
-    <small class="form-text text-muted">
-      An arbitrary scale of value from 0 to 10.
-    </small>
+  <label>Value</label>
+  <div class="form-row">
+    <div class="form-group col">
+      <input class="form-control-range custom-range" type="range" name="value" id="value" min="0" max="10" value="{{item.valueRanged}}"/>
+      <small class="form-text text-muted">
+        An arbitrary scale of value from 0 to 10.
+      </small>
+    </div>
+    <div class="form-group col-auto">
+      <input type="number" class="form-control" min=0 max=10 id="value-output" value="5"/>
+    </div>
   </div>
 
 
@@ -181,6 +186,13 @@ $(document).ready( function() {
   for(let select of selects){
     select.value = item[select.name];
   }
+});
+
+$(document).on("input", "#value", function(e){
+  $("#value-output").val($(this).val());
+});
+$(document).on("change", "#value-output", function(e){
+  $("#value").val($(this).val());
 });
 
 //POPup on imageclick
@@ -273,7 +285,6 @@ function submitForm () {
                 $(document).off("click", "#submitModal-formreset");
                 $(document).off("click", "#submitModal-moveon");
 
-                console.log(e)
                 tagList.add(res.tagList);
                 materialList.add(res.materialList);
                 collectionList.add(res.collectionList);
