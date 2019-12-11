@@ -21,6 +21,7 @@
     "forever": "^1.0.0",
     "formidable": "^1.2.1",
     "handlebars-helpers": "^0.10.0",
+    "js-yaml": "^3.13.1",
     "jsbarcode": "^3.11.0",
     "lodash": "^4.17.13",
     "lodash-id": "^0.14.0",

@@ -1,0 +1,36 @@
+<div class="modal fade show" id="changelog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Changelog</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        {{#each changelog}}
+          <h5>{{@key}}</h5>
+          {{#each this}}
+            {{#if this}}
+              <h6>{{@key}}</h6>
+              <ul>
+                {{#each this}}
+                <li>{{this}}</li>
+                {{/each}}
+              </ul>
+            {{/if}}
+          {{/each}}
+          {{#unless @last}}<hr/>{{/unless}}
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</div>
+
+{{#if show}}
+<script>
+$(document).ready(function(){
+    $("#changelog").modal("show");
+})
+</script>
+{{/if}}

@@ -1,0 +1,25 @@
+#CHANGELOG
+Unreleased:
+    Notes:
+      - Untagged changes
+    Added:
+      - added polling after pressing submit
+      - added update popup and changelog
+      - added a changelog
+      - implemented changelog popup on login
+    Changed:
+    Deprecated:
+    Removed:
+    Fixed:
+      - fixed date entry on safari
+      - fixed form clearing on "submit and add new"
+    Security:
+V1.0.0:
+  Notes:
+    - Inital Release
+  Added:
+  Changed:
+  Deprecated:
+  Removed:
+  Fixed:
+  Security:
