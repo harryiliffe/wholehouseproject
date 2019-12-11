@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "test": "",
-    "start": "node app.js"
+    "start": "forever -l logs/forever.log -o logs/out.log -e logs/error.log -a app.js"
   },
   "author": "Harry Iliffe <iliffe.harry@gmail.com>",
   "license": "MIT",
