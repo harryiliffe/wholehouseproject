@@ -15,6 +15,24 @@
 </div>
 
 
+<div class="modal fade show" id="submitModal" data-backdrop="static" tabindex="-1" role="dialog" aria-modal="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content" id="submitModal-content">
+      <div class="modal-body d-flex align-items-center" style="min-height: 64px;">
+        <strong id="submitModal-text">Submitting...</strong>
+        <div class="spinner-border ml-auto" id="submitModal-spinner" role="status" aria-hidden="true"></div>
+      </div>
+      <div id="submitModal-footSuccess" style="display: none;" class="modal-footer">
+        <button type="button" id="submitModal-formreset" class="btn btn-outline-secondary" data-dismiss="modal">Add Another</button>
+        <button type="button" id="submitModal-moveon" class="btn btn-outline-success">View Object</button>
+      </div>
+      <div id="submitModal-footError" style="display: none;" class="modal-footer">
+        <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+        <button type="button" onClick="submitForm()" class="btn btn-outline-danger">Try Again</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <form class="col-12 needs-validation"  id="form"  enctype="multipart/form-data" novalidate>
 
@@ -78,11 +96,15 @@
       </select>
     </div>
     <div class="form-group col">
-      <input class="form-control" name="acquisition" placeholder="acquisition details">
+      <input class="form-control" name="acquisition" value="{{item.acquisition}}" placeholder="Details">
       </input>
     </div>
     <div class="form-group col">
-      <input type="month" class="form-control" name="acquisition-date" value="{{item.dateAcquired}}" id="acquisition-date">
+      <input class="form-control" name="acquisition-value" value="{{item.acquisition-value}}" placeholder="Price">
+      </input>
+    </div>
+    <div class="form-group col">
+      <input type="month" class="form-control" name="acquisition-date" value="{{item.dateAcquired}}" id="acquisition-date" placeholder="Date (YYYY-MM-DD)">
     </div>
   </div>
 
@@ -104,7 +126,7 @@
 
     <div class="form-group col-auto">
       <label for="quantity">Quanitity</label>
-      <input type="number" class="form-control" name="quantity" value="{{item.quantity}}" id="quantity">
+      <input type="number" class="form-control" name="quantity" value="{{default item.quantity 1}}" id="quantity">
     </div>
   </div>
 
@@ -123,8 +145,7 @@
   </div>
 
   <div class="form-group">
-    <button type="button" onclick="SubForm(true)" class="btn btn-outline-secondary">Submit and Enter New</button>
-    <button type="button" onclick="SubForm(false)" class="btn btn-outline-success">Submit</button>
+    <button type="button" id="submitForm" class="btn btn-outline-success">Submit</button>
   </div>
 
   <div class="alert alert-success" role="alert" id="successAlert" style="display: None; opacity:0;">
@@ -217,7 +238,11 @@ $(document).on('change', ':file', function() {
 
 
 //CALLED WHEN FORM IS SUBMITTED
-function SubForm (formReset){
+$(document).on("click", "#submitForm", function(){
+  submitForm();
+});
+
+function submitForm () {
     var itemID = new URLSearchParams(window.location.search).get('itemID');
     var form = document.getElementById('form');
     var formData = new FormData(form);
@@ -231,15 +256,26 @@ function SubForm (formReset){
           });
       }, 4000);
     } else {
+      $("#submitModal").modal('show');
       $.ajax({
           url: '/add',
           type: 'POST',
           data: formData,
           enctype: 'multipart/form-data',
           success: function (res) {
+              $("#submitModal-footSuccess").show(); //showbuttons
+              $("#submitModal-spinner").hide();
+              $("#submitModal-text").html("Submitted");
+
               console.log("Form Submited");
-              if(formReset){
+
+              $(document).on("click", "#submitModal-formreset", function(e){
+                $(document).off("click", "#submitModal-formreset");
+                $(document).off("click", "#submitModal-moveon");
+
+                console.log(e)
                 tagList.add(res.tagList);
+                materialList.add(res.materialList);
                 collectionList.add(res.collectionList);
 
                 window.history.replaceState(null,null,"/add?itemID="+res.item.id);
@@ -247,26 +283,37 @@ function SubForm (formReset){
 
                 //clears form
                 $("input,textarea").each(function(){this.value=""});
-                $('.tagsinput').tagsinput('removeAll');
+                $('#tags').tagsinput('removeAll');
+                $('#materials').tagsinput('removeAll');
 
-                $("#successAlert").show().fadeTo(200,1);
-                window.setTimeout(function() {
-                    $("#successAlert").fadeTo(200, 0, function(){
-                        $(this).hide();
-                    });
-                }, 2000);
+                $('#imageThumbs').find("img").parent().remove()
+                $("#quality").val(1);
+                $("#submitModal").modal('hide');
+                $("#submitModal-footSuccess").hide(); //showbuttons
+                $("#submitModal-spinner").show();
+                $("#submitModal-text").html("Submitting...");
 
-              } else {
+              });
+
+              $(document).on("click", "#submitModal-moveon", function(e){
+                $(document).off("click", "#submitModal-formreset");
+                $(document).off("click", "#submitModal-moveon");
                 window.history.replaceState(null,null,"/add?itemID="+res.item.id);
                 window.location.href = "/view/object?itemID="+res.item.id;
-              }
+              });
+          },
+          error: function (res) {
+            $("#submitModal-footError").show(); //showbuttons
+            $("#submitModal-spinner").hide();
+            $("#submitModal-text").html("Error Submitting");
+
           },
           cache: false,
           contentType: false,
           processData: false
       });
     }
-  }
+  };
 
 
 //=======COLLECTION========
