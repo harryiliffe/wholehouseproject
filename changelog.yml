@@ -1,13 +1,15 @@
 #CHANGELOG
-Unreleased:
+V1.1.0:
     Notes:
-      - Untagged changes
+      - Improved a number of add form issues, and created a changelog system with popup
+      - Also altered npm start to use forever.js
     Added:
       - added polling after pressing submit
       - added update popup and changelog
       - added a changelog
       - implemented changelog popup on login
     Changed:
+      - npm start now uses forever.js
     Deprecated:
     Removed:
     Fixed:
