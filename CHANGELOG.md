@@ -1,4 +1,14 @@
 #CHANGELOG
+UNRELEASED V1.1.1:
+    Notes:
+
+    Added:
+      - Restructured repo and added install scripts
+    Changed:
+    Deprecated:
+    Removed:
+    Fixed:
+    Security:
 V1.1.0:
     Notes:
       - Improved a number of add form issues, and created a changelog system with popup

@@ -1,12 +1,13 @@
 {
   "name": "WholeHouseProject",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "",
   "private": true,
   "main": "index.js",
   "scripts": {
     "test": "",
-    "start": "forever -l logs/forever.log -o logs/out.log -e logs/error.log -a app.js"
+    "postinstall": "node scripts/makedirs.js",
+    "start": "cd src/ && forever -l logs/forever.log -o logs/out.log -e logs/error.log -a app.js"
   },
   "author": "Harry Iliffe <iliffe.harry@gmail.com>",
   "license": "MIT",

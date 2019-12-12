@@ -5,7 +5,7 @@ const fs = require('fs')
 const yaml = require('js-yaml');
 const low = require('lowdb');
 const FileSync = require('lowdb/adapters/FileSync');
-const adapter = new FileSync('changelog.yml', {
+const adapter = new FileSync('../CHANGELOG.md', {
   defaultValue: [],
   serialize: (array) => yaml.dump(array),
   deserialize: (string) => yaml.safeLoad(string)

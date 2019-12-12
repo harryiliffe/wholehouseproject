@@ -66,4 +66,4 @@ typings/
 db
 tmp_uploads/
 uploads/
-public/assets/*
+assets/
