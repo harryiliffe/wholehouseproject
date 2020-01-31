@@ -5,14 +5,15 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "test": "",
+    "test": "cd src/ && node app.js",
     "postinstall": "node scripts/makedirs.js",
-    "start": "cd src/ && forever -l logs/forever.log -o logs/out.log -e logs/error.log -a app.js"
+    "start": "cd src/ && forever -l logs/forever.log -o logs/out.log -e logs/error.log -a --minUpTime 1000 --spinSleepTime 1000 app.js"
   },
   "author": "Harry Iliffe <iliffe.harry@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "bootstrap": "^4.3.1",
+    "compressorjs": "^1.0.6",
     "console-stamp": "^0.2.9",
     "express": "^4.17.1",
     "express-formidable": "^1.2.0",

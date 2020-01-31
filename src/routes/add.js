@@ -78,9 +78,9 @@ router.post('/', function (req, res) {
   }
 
   //add data to db(sess.user)
-  if(data.itemID){
+  if(data.id){
     item = userdb.get("items")
-             .getById(data.itemID)
+             .getById(data.id)
              .assign(data)
              .write();
   } else {
@@ -89,7 +89,7 @@ router.post('/', function (req, res) {
              .write();
   }
   //====== proccess files ======
-  const photos = req.files.photos
+  const photos = req.files.compressedPhotos
   //make directory
   folder = path.join( 'public/assets/' +item.id)
   if(!fs.existsSync(folder)){

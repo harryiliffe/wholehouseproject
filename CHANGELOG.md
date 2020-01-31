@@ -1,13 +1,21 @@
 #CHANGELOG
-UNRELEASED V1.1.1:
+V1.2.0:
     Notes:
-
+      - A bunch of boring small fixes.
+      - Now with client side compression uploading images should be a lot faster, and objects will take less space on the server.
     Added:
       - Restructured repo and added install scripts
+      - Added image blobs
+      - Compressorjs to compress images before uploading to server
+      - Prevented files other than images from being uploaded.
     Changed:
+      - Changed ID chars to work with barcodes.
     Deprecated:
     Removed:
     Fixed:
+      - Temporary files now get removed. Not sure why this wasn't working but it does know so...
+      - Prevented duplicate id being added to database after updating objects.
+      - Fixed file uploads from android.
     Security:
 V1.1.0:
     Notes:

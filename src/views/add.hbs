@@ -145,7 +145,7 @@
           </div>
         {{/each}}
     </div>
-    <input type="file" name="photos" id="imgupload" style="display: none;" multiple>
+    <input type="file" name="photos" accept="image/*" id="imgupload" style="display: none;" multiple>
     <button type="button" onclick="$('#imgupload').trigger('click');" class="btn btn-outline-primary mt-2">Browse&hellip;</button>
   </div>
 
@@ -179,6 +179,7 @@ $(document).ready( function() {
   }
 });
 
+// Loads form data
 $(document).ready( function() {
   var selects = $("select");
   var itemDefault = {"acquisition-method":"Purchased New", "condition": "Excellent"};
@@ -199,7 +200,7 @@ $(document).on("change", "#value-output", function(e){
 $('#imageVeiwer').on('show.bs.modal', function (event) {
   var image = $(event.relatedTarget) // Button that triggered the modal
   var modal = $(this)
-  modal.find('.modal-body img').attr("src", image.data('image'));
+  modal.find('.modal-body img').attr("src", image.attr('src'));
   modal.find('.modal-body img').attr("id", image.attr('id'));
 })
 
@@ -230,9 +231,10 @@ function removeImage(){
   }
 }
 
-
+var fileList = [];
 //CALLED WHEN FILE ADDED
 $(document).on('change', ':file', function() {
+  fileList = [];
     var files = $(this).get(0).files;
     var filePreviews = $('#imageThumbs');
     //delete old files
@@ -240,12 +242,21 @@ $(document).on('change', ':file', function() {
     //add new files
     $("#placeholder").hide();
     for(let file of files){
-      let reader = new FileReader();
-      reader.onload = function (e) {
-          filePreviews.append('<div class="p-2 col-6 col-sm-4 col-md-3 col-lg-2"><img src="'+e.target.result+'" class="img-thumbnail border-success" data-toggle="modal" data-target="#imageVeiwer" data-image="'+e.target.result+'" data-uploaded=false></div>');
-      }
-      reader.readAsDataURL(file);
+      new Compressor(file, {
+        quality: 0.9,
+        maxWidth: 1200,
+        maxHeight: 1200,
+        success(result){
+          let src = URL.createObjectURL(result);
+          fileList.push({"result":result,"src":src,"name":file.name});
+          filePreviews.append('<div class="p-2 col-6 col-sm-4 col-md-3 col-lg-2"><img src="'+src+'" class="img-thumbnail border-success" data-toggle="modal" data-target="#imageVeiwer" data-uploaded=false></div>');
+        },
+        error(err) {
+          console.log(err.message);
+        }
+      });
     }
+
 });
 
 
@@ -258,7 +269,11 @@ function submitForm () {
     var itemID = new URLSearchParams(window.location.search).get('itemID');
     var form = document.getElementById('form');
     var formData = new FormData(form);
-    if(itemID){formData.append("itemID", itemID);}
+    formData.delete("photos");
+    for(let file of fileList){
+      formData.append("compressedPhotos",file.result, file.name);
+    }
+    if(itemID){formData.append("id", itemID);}
     if (!form.checkValidity()){
       $("#invalidForm").show().fadeTo(200,1);
       form.classList.add('was-validated');
