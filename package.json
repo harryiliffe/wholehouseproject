@@ -25,7 +25,7 @@
     "handlebars-helpers": "^0.10.0",
     "js-yaml": "^3.13.1",
     "jsbarcode": "^3.11.0",
-    "lodash": "^4.17.13",
+    "lodash": "^4.17.19",
     "lodash-id": "^0.14.0",
     "lowdb": "^1.0.0",
     "lowdb-session-store": "^1.1.0",
